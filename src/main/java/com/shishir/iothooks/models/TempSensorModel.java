@@ -14,10 +14,8 @@ public class TempSensorModel {
     private Long id;
     private Date dateTime;
     private Float temperature;
-    // only Celsius and Fahrenheit
+    //only Celsius and Fahrenheit
     private String unit;
-
-
 
     public Long getId() {
         return id;
