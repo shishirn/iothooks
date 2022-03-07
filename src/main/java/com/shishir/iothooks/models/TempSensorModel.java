@@ -17,8 +17,6 @@ public class TempSensorModel {
     // only Celsius and Fahrenheit
     private String unit;
 
-
-
     public Long getId() {
         return id;
     }
