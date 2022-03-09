@@ -4,15 +4,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.sql.Date;
+import java.sql.Timestamp;
 
-@Entity
+@Entity(name="tempsensor")
 public class TempSensorModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private Date dateTime;
+    private Timestamp datetime;
     private Float temperature;
     //only Celsius and Fahrenheit
     private String unit;
@@ -25,12 +25,12 @@ public class TempSensorModel {
         this.id = id;
     }
 
-    public Date getDateTime() {
-        return dateTime;
+    public Timestamp getDatetime() {
+        return datetime;
     }
 
-    public void setDateTime(Date dateTime) {
-        this.dateTime = dateTime;
+    public void setDatetime(Timestamp datetime) {
+        this.datetime = datetime;
     }
 
     public Float getTemperature() {
