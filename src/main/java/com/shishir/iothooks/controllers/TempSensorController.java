@@ -2,6 +2,7 @@ package com.shishir.iothooks.controllers;
 
 import com.shishir.iothooks.models.TempSensorModel;
 import com.shishir.iothooks.repositories.TempSensorRepository;
+import com.shishir.iothooks.service.TempSensorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,18 +14,21 @@ import java.util.Optional;
 public class TempSensorController {
 
     @Autowired
-    TempSensorRepository tempSensorRepository;
+    TempSensorService tempSensorService;
 
-    @PostMapping("/")
+    @PostMapping()
     public TempSensorModel postTempReading(@RequestBody TempSensorModel tempSensorModel){
-
-         return tempSensorRepository.save(tempSensorModel);
-
+         return tempSensorService.save(tempSensorModel);
     }
 
     @GetMapping("/{id}")
     public Optional<TempSensorModel> getTempReadingById(@PathVariable Long id){
-        return tempSensorRepository.findById(id);
+        return tempSensorService.findById(id);
+    }
+
+    @GetMapping()
+    public Iterable<TempSensorModel> getAllTempReading(){
+        return tempSensorService.findAll();
     }
 
 }

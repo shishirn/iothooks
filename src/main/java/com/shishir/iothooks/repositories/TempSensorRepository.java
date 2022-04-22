@@ -7,4 +7,5 @@ import com.shishir.iothooks.models.TempSensorModel;
 
 @Repository
 public interface TempSensorRepository extends CrudRepository<TempSensorModel, Long> {
+
 }
