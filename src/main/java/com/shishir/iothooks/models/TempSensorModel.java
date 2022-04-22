@@ -23,5 +23,6 @@ public class TempSensorModel {
     private Float temperature;
     private String location;
     private String unit;
+    private String deviceid;
 
 }
