@@ -4,6 +4,7 @@ import com.shishir.iothooks.models.TempSensorModel;
 import com.shishir.iothooks.repositories.TempSensorRepository;
 import com.shishir.iothooks.service.TempSensorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,9 +17,10 @@ public class TempSensorController {
     @Autowired
     TempSensorService tempSensorService;
 
+
     @PostMapping()
     public TempSensorModel postTempReading(@RequestBody TempSensorModel tempSensorModel){
-         return tempSensorService.save(tempSensorModel);
+        return tempSensorService.save(tempSensorModel);
     }
 
     @GetMapping("/{id}")
@@ -31,4 +33,8 @@ public class TempSensorController {
         return tempSensorService.findAll();
     }
 
+    @GetMapping("/status")
+    public String getEquipmentStatus(@RequestParam(name="deviceid",required = true) String deviceid){
+        return tempSensorService.getEquipmentStatus(deviceid);
+    }
 }
