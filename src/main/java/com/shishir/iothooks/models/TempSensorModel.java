@@ -26,8 +26,8 @@ public class TempSensorModel {
     private String deviceid;
     private Integer uptimeInMinutes;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    /*@ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "userid", nullable = false)
-    private UserModel userModel;
+    private UserModel userModel;*/
 
 }
