@@ -93,4 +93,12 @@ public class TempSensorService {
         }
         return "OFF";
     }
+
+    public void deleteAll() {
+        tempSensorRepository.deleteAll();
+    }
+
+    public void deleteById(Long id) {
+        tempSensorRepository.deleteById(id);
+    }
 }

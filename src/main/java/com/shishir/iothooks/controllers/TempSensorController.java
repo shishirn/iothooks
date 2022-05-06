@@ -37,4 +37,16 @@ public class TempSensorController {
     public String getEquipmentStatus(@RequestParam(name="deviceid",required = true) String deviceid){
         return tempSensorService.getEquipmentStatus(deviceid);
     }
+
+    @DeleteMapping
+    public void deleteAll(){
+        tempSensorService.deleteAll();
+
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteByID(@PathVariable Long id){
+        tempSensorService.deleteById(id);
+
+    }
 }

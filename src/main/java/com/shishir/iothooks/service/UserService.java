@@ -42,4 +42,11 @@ public class UserService {
 
     }
 
+    public void deleteAll() {
+        userRepository.deleteAll();
+    }
+
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
+    }
 }
