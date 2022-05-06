@@ -28,7 +28,7 @@ public class TempSensorService {
     private Integer notificationFreq;
 
     public TempSensorModel save(TempSensorModel tempSensorModel) {
-        notificationFreq=5;
+        notificationFreq=1;
 
         //set time of sensor readings
         tempSensorModel.setDatetime(new Timestamp(System.currentTimeMillis()));
