@@ -16,6 +16,6 @@ public interface TempSensorReadingRepository extends CrudRepository<TempSensorRe
     TempSensorReading getMostRecentTempReading(String deviceid);
 
     @Query(value="select * from tempsensorreadings where tempsensor_id = ?1", nativeQuery = true)
-    List<TempSensorReading> getReadingBySensorId(String deviceid);
+    List<TempSensorReading> getReadingBySensorId(Integer deviceid);
 
 }

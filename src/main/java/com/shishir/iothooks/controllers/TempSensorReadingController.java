@@ -26,7 +26,7 @@ public class TempSensorReadingController {
     }
 
     @GetMapping()
-    public Iterable<TempSensorReading> getAllTempReading(@RequestParam(name="sensorid",required = false) String deviceid){
+    public Iterable<TempSensorReading> getAllTempReading(@RequestParam(name="sensorid",required = false) Integer deviceid){
         return tempSensorReadingService.getTempSensorReadings(deviceid);
     }
 

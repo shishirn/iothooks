@@ -101,7 +101,7 @@ public class TempSensorReadingService {
         tempSensorReadingRepository.deleteById(id);
     }
 
-    public Iterable<TempSensorReading> getTempSensorReadings(String deviceid) {
+    public Iterable<TempSensorReading> getTempSensorReadings(Integer deviceid) {
         List<TempSensorReading> tempSensorReadingList = null;
 
         if(deviceid==null){
