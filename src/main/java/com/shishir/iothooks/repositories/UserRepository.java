@@ -1,10 +1,10 @@
 package com.shishir.iothooks.repositories;
 
-import com.shishir.iothooks.models.UserModel;
+import com.shishir.iothooks.models.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends CrudRepository<UserModel, Long> {
-    UserModel findByUsername(String username);
+public interface UserRepository extends CrudRepository<User, Long> {
+    User findByUsername(String username);
 }
