@@ -38,6 +38,7 @@ public class TempSensor {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+
     private String location;
 
 }
