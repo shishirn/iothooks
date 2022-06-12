@@ -1,22 +1,33 @@
 package com.shishir.iothooks.service;
 
+import com.shishir.iothooks.models.TempSensor;
 import com.shishir.iothooks.models.TempSensorReading;
 import com.shishir.iothooks.repositories.TempSensorReadingRepository;
+import com.shishir.iothooks.repositories.TempSensorRepository;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
 public class TempSensorReadingService {
 
+    Logger logger = LoggerFactory.getLogger(TempSensorReadingService.class);
+
     @Autowired
     TempSensorReadingRepository tempSensorReadingRepository;
+
+    @Autowired
+    TempSensorRepository tempSensorRepository;
 
     @Value("${temp.upperlimit}")
     private Integer upperLimit;
@@ -27,31 +38,40 @@ public class TempSensorReadingService {
     private Integer notificationFreq;
 
     public TempSensorReading save(TempSensorReading tempSensorReading) {
-        notificationFreq=1;
+        notificationFreq = 1;
+        TempSensor tempSensor = tempSensorReading.getTempSensor();
 
         //set time of sensor readings
         tempSensorReading.setDatetime(new Timestamp(System.currentTimeMillis()));
 
-        //Check if reported temperature is above the upper threshold limit
-        if(tempSensorReading !=null && tempSensorReading.getTemperature()>upperLimit){
-            //Get last reading for the sensor
-            TempSensorReading mostRecentTempReading = tempSensorReadingRepository
-                    .getMostRecentTempReading(tempSensorReading.getTempSensor().getDeviceid());
-            //Update the equipment uptime by 1 min
-            if(mostRecentTempReading!=null){
-                tempSensorReading.setUptimeInMinutes(mostRecentTempReading.getUptimeInMinutes()+1);
-            }
-            else
-                tempSensorReading.setUptimeInMinutes(1);
-        }
-        else{
-            tempSensorReading.setUptimeInMinutes(0);
-        }
+        //Check if reported temperature is above the upper threshold limit. If yes, then update the maxUptime value
+        //by last current time minus last reported time.
+        int upperTempLimit = tempSensor.getUpperTemperatureLimit();
 
-        //check if equipment uptime is higher than the max Uptime defined for that equipment and send IFTTT notification if true
-        if(tempSensorReading.getUptimeInMinutes()>=maxUptimeInMinutes){
-            System.out.println("****** Uptime in minutes "+ tempSensorReading.getUptimeInMinutes());
-            if(tempSensorReading.getUptimeInMinutes()%notificationFreq==0){
+        if (tempSensorReading != null && tempSensorReading.getTemperature() > upperTempLimit) {
+
+            //Get last reported reading of the sensor
+            TempSensorReading lastReportedTempReading = tempSensorReadingRepository
+                    .lastReportedTemperatureReading(tempSensorReading.getTempSensor().getDeviceid());
+
+            //Update the equipment uptime by diff of current timestamp and last reported timestamp
+            if (lastReportedTempReading != null) {
+                Timestamp lastReportedReadingTimestamp = lastReportedTempReading.getDatetime();
+                int diffInMinutes = (int) TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - lastReportedReadingTimestamp.getTime());
+                logger.info("time diff in minutes is : " + diffInMinutes);
+                tempSensorReading.setUptimeInMinutes(lastReportedTempReading.getUptimeInMinutes() +
+                        (diffInMinutes));
+            } else
+                tempSensorReading.setUptimeInMinutes(0);
+        } else
+            tempSensorReading.setUptimeInMinutes(0);
+
+
+        //check if equipment uptime is higher than the max Uptime defined for
+        // that equipment and send IFTTT notification if true
+        /*if (tempSensorReading.getUptimeInMinutes() >= maxUptimeInMinutes) {
+            System.out.println("****** Uptime in minutes " + tempSensorReading.getUptimeInMinutes());
+            if (tempSensorReading.getUptimeInMinutes() % notificationFreq == 0) {
                 System.out.println("Sending notification!!!!!");
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .build();
@@ -68,7 +88,8 @@ public class TempSensorReadingService {
                     e.printStackTrace();
                 }
             }
-        }
+        }*/
+
         return tempSensorReadingRepository.save(tempSensorReading);
     }
 
@@ -79,15 +100,15 @@ public class TempSensorReadingService {
 
     public Iterable<TempSensorReading> findAll() {
         List<TempSensorReading> tempSensorReadingList = (List<TempSensorReading>) tempSensorReadingRepository.findAll();
-        tempSensorReadingList.sort((o1, o2) -> o1.getId()>o2.getId() ? -1 : 1);
+        tempSensorReadingList.sort((o1, o2) -> o1.getId() > o2.getId() ? -1 : 1);
         //return tempSensorRepository.findAll();
         return tempSensorReadingList;
     }
 
 
     public String getEquipmentStatus(String deviceid) {
-        TempSensorReading tempSensorReading = tempSensorReadingRepository.getMostRecentTempReading(deviceid);
-        if(tempSensorReading.getTemperature() > 100){
+        TempSensorReading tempSensorReading = tempSensorReadingRepository.lastReportedTemperatureReading(deviceid);
+        if (tempSensorReading.getTemperature() > 100) {
             return "ON";
         }
         return "OFF";
@@ -104,14 +125,13 @@ public class TempSensorReadingService {
     public Iterable<TempSensorReading> getTempSensorReadings(Integer deviceid) {
         List<TempSensorReading> tempSensorReadingList = null;
 
-        if(deviceid==null){
-            tempSensorReadingList=(List<TempSensorReading>) tempSensorReadingRepository.findAll();
-        }
-        else{
+        if (deviceid == null) {
+            tempSensorReadingList = (List<TempSensorReading>) tempSensorReadingRepository.findAll();
+        } else {
             tempSensorReadingList = tempSensorReadingRepository.getReadingBySensorId(deviceid);
         }
 
-        tempSensorReadingList.sort((o1, o2) -> o1.getId()>o2.getId() ? -1 : 1);
+        tempSensorReadingList.sort((o1, o2) -> o1.getId() > o2.getId() ? -1 : 1);
         return tempSensorReadingList;
     }
 }
